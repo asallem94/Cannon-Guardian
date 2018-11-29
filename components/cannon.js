@@ -1,7 +1,7 @@
 class Cannon {
   constructor( ctx, canWidth, canHeight){
-    this.canWidth;
-    this.canHeight;
+    this.canWidth = canWidth;
+    this.canHeight = canHeight;
     this.ctx = ctx;
     this.x0 = canWidth/2;
     this.y0 = canHeight-30;
@@ -45,9 +45,12 @@ class Cannon {
     }
 
     // console.log(`y axis: ${y}`);
-    if(this.y > this.canHeight - this.cannonRadius || this.y < this.cannonRadius) {
+    if(this.y < this.cannonRadius) {
       this.y0 = this.y;
       this.vy0 = -(2 * this.g * this.t);
+    } else if(y + dy > canvas.height-ballRadius) {
+      alert("GAME OVER");
+      document.location.reload();
     }
   }
 }

@@ -86,10 +86,10 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./cannon.js":
-/*!*******************!*\
-  !*** ./cannon.js ***!
-  \*******************/
+/***/ "./components/cannon.js":
+/*!******************************!*\
+  !*** ./components/cannon.js ***!
+  \******************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -97,8 +97,8 @@
 __webpack_require__.r(__webpack_exports__);
 class Cannon {
   constructor( ctx, canWidth, canHeight){
-    this.canWidth;
-    this.canHeight;
+    this.canWidth = canWidth;
+    this.canHeight = canHeight;
     this.ctx = ctx;
     this.x0 = canWidth/2;
     this.y0 = canHeight-30;
@@ -142,14 +142,63 @@ class Cannon {
     }
 
     // console.log(`y axis: ${y}`);
-    if(this.y > this.canHeight - this.cannonRadius || this.y < this.cannonRadius) {
+    if(this.y < this.cannonRadius) {
       this.y0 = this.y;
       this.vy0 = -(2 * this.g * this.t);
+    } else if(y + dy > canvas.height-ballRadius) {
+      alert("GAME OVER");
+      document.location.reload();
     }
   }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Cannon);
+
+
+/***/ }),
+
+/***/ "./components/shield.js":
+/*!******************************!*\
+  !*** ./components/shield.js ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class Shield{
+  constructor(ctx, canWidth, canHeight){
+    this.ctx = ctx;
+    this.canWidth = canWidth;
+    this.canHeight = canHeight;
+
+    this.paddleHeight = 10;
+    this.paddleWidth = 75;
+    this.paddleX = (this.canWidth-this.paddleWidth)/2;
+
+  }
+
+  drawShield() {
+    this.ctx.beginPath();
+    this.ctx.rect(this.paddleX, this.canHeight-this.paddleHeight, this.paddleWidth, this.paddleHeight);
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fill();
+    this.ctx.closePath();
+  }
+
+  moveShield(rightPressed, leftPressed){
+    const sensitivity = 7;
+
+    if(rightPressed && this.paddleX < this.canWidth-this.paddleWidth) {
+      this.paddleX += sensitivity;
+    }
+    if(leftPressed && this.paddleX > 0) {
+      this.paddleX -= sensitivity;
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Shield);
 
 
 /***/ }),
@@ -163,8 +212,8 @@ class Cannon {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _paddle_controller__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./paddle_controller */ "./paddle_controller.js");
-/* harmony import */ var _cannon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./cannon */ "./cannon.js");
+/* harmony import */ var _components_cannon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/cannon */ "./components/cannon.js");
+/* harmony import */ var _components_shield__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/shield */ "./components/shield.js");
 
 
 
@@ -178,49 +227,18 @@ document.addEventListener('DOMContentLoaded', () => {
   canvasElement.width = canWidth;
   canvasElement.height = canHeight;
 
-  const firstCannon = new _cannon__WEBPACK_IMPORTED_MODULE_1__["default"](ctx, canWidth, canHeight);
+  // create guardianShield
+  const guardianShield = new _components_shield__WEBPACK_IMPORTED_MODULE_1__["default"](ctx, canWidth, canHeight);
 
-  function draw() {
-    ctx.clearRect(0, 0, canWidth, canHeight);
-    firstCannon.drawCannon();
-    firstCannon.moveBall();
-  }
-
-  setInterval(draw, 10);
-});
-
-
-/***/ }),
-
-/***/ "./paddle_controller.js":
-/*!******************************!*\
-  !*** ./paddle_controller.js ***!
-  \******************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-const paddleController = () => {
-  let paddleHeight = 10;
-  let paddleWidth = 75;
-  let paddleX = (canvas.width-paddleWidth)/2;
-
-
-  function drawPaddle() {
-    ctx.beginPath();
-    ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
-    ctx.fillStyle = "#0095DD";
-    ctx.fill();
-    ctx.closePath();
-  }
+  let rightPressed;
+  let leftPressed;
 
   function keyDownHandler(e) {
     if(e.keyCode == 39) {
-        rightPressed = true;
+      rightPressed = true;
     }
     else if(e.keyCode == 37) {
-        leftPressed = true;
+      leftPressed = true;
     }
   }
 
@@ -235,10 +253,26 @@ const paddleController = () => {
 
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
-};
+
+  document.addEventListener("keydown", guardianShield.keyDownHandler, false);
+  document.addEventListener("keyup", keyUpHandler, false);
 
 
-/* harmony default export */ __webpack_exports__["default"] = (paddleController);
+  // create cannons
+  const firstCannon = new _components_cannon__WEBPACK_IMPORTED_MODULE_0__["default"](ctx, canWidth, canHeight);
+
+  function draw() {
+    ctx.clearRect(0, 0, canWidth, canHeight);
+    guardianShield.drawShield();
+    guardianShield.moveShield(rightPressed, leftPressed);
+
+    firstCannon.drawCannon();
+    firstCannon.moveBall();
+
+  }
+
+  setInterval(draw, 10);
+});
 
 
 /***/ })
