@@ -42,9 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener("keyup", keyUpHandler, false);
 
   const cannons = [];
+  const toDelete = [];
 
-  let delay = 0
-  // create cannons
+  let delay = 0;
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
@@ -58,17 +58,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    for (var i = 0; i < cannons.length; i++) {
+    for (var i = cannons.length-1; i >=0 ; i--) {
+      // debugger
       cannons[i].moveCannon(guardianShield);
-      if (cannons[i].status) {
+      if (cannons[i].status === 1) {
         cannons[i].drawCannon();
-      }else{
-        cannons[i].blockedExplosion()
+      }
+      if (cannons[i].status < 0 && cannons[i].status => -5 ){ //cannon to explode on shield
+        cannons[i].blockedExplosion();
+        cannons[i].status += 1;
+      }
+      if (cannons[i].status === 0){ // status === 0 , remove cannon
+        toDelete.push(i);
       }
     }
-
-
+    for (var i = toDelete.length - 1; i >= 0; i--) {
+      toDelete.splice(i, 1);
+      cannons.splice(toDelete[i], 1);
+    }
   }
+
 
   setInterval(draw, 10);
 });
