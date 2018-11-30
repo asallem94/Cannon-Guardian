@@ -1,7 +1,7 @@
 class Cannon {
-  constructor( ctx, canWidth, canHeight){
-    const colors = ["red", "green", "orange", "brown", "black", "blue", "purple","rgb(0,0,255)" , "white" , "gray"]
-    this.color = colors[Math.floor(Math.random()*10)]
+  constructor( ctx, canWidth, canHeight, clusterAngle){
+    const colors = ["red", "green", "orange", "brown", "black", "blue", "purple","rgb(0,0,255)" , "lightblue" , "gray"];
+    this.color = colors[Math.floor(Math.random()*10)];
     this.canWidth = canWidth;
     this.canHeight = canHeight;
     this.ctx = ctx;
@@ -16,7 +16,7 @@ class Cannon {
 
     this.status = 1;
 
-    const angle = (Math.random()/2 +1/4)* Math.PI ;
+    const angle = (Math.random()/20 + clusterAngle)* Math.PI ;
 
     this.vy0 = v0 * Math.sin (angle);
     this.vx0 = v0 * Math.cos (angle);
@@ -30,11 +30,16 @@ class Cannon {
   }
 
   drawCannon(){
+    this.ctx.shadowOffsetY = 350-this.y+ 8*this.cannonRadius;
+    this.ctx.shadowColor= "rgba(0,0,0,0.5)";
+
     this.ctx.beginPath();
     this.ctx.arc(this.x, this.y, this.cannonRadius, 0, Math.PI*2);
-    this.ctx.fillStyle = this.color ;
+    this.ctx.fillStyle = "white" ;
+    this.ctx.strokeStyle = this.color;
+    this.ctx.lineWidth = this.cannonRadius * 0.1;
     this.ctx.fill();
-    this.ctx.closePath();
+    this.ctx.stroke();
   }
 
   blockedExplosion(){
@@ -52,9 +57,19 @@ class Cannon {
     this.ctx.lineWidth = 5;
     this.ctx.fill();
     this.ctx.closePath();
+
+    this.ctx.beginPath();
+    this.ctx.arc(this.x +5 * Math.random(), this.y + (4 * Math.random()), this.cannonRadius-14, 0, Math.PI*2);
+    this.ctx.fillStyle = "red";
+    this.ctx.lineWidth = 2;
+    this.ctx.fill();
+    this.ctx.closePath();
   }
 
   moveCannon(guardianShield){
+    if (this.status < 0) {
+      return null;
+    }
     this.t += this.dt;
 
     this.cannonRadius += this.dr;
@@ -68,18 +83,19 @@ class Cannon {
       this.vx0 = -(this.vx0) ;
     }
 
-    // debugger
-
+    // cannons explodes
     if(this.y >= this.canHeight - guardianShield.paddleHeight - this.cannonRadius && this.y <= this.canHeight) {
       if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
         // this.blockedExplosion();
-        this.status = -3;
+        this.status = -2;
       }
     }
+
+    // game over
     if(this.y > this.canHeight + 2 * this.cannonRadius) {
       this.status = 0;
-      alert("GAME OVER");
-      document.location.reload();
+      // alert("GAME OVER");
+      // document.location.reload();
     }
   }
 }

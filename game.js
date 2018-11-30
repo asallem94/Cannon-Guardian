@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   }
 
+
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
 
@@ -42,17 +43,26 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener("keyup", keyUpHandler, false);
 
   const cannons = [];
-  const toDelete = [];
-
   let delay = 0;
+  let clusterDelay = 0;
+  let clusterAngle  = 0.3 * Math.random() + 0.3;
+
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
     guardianShield.moveShield(rightPressed, leftPressed);
 
+    if (clusterDelay === 0){
+      clusterAngle  = 0.3 * Math.random() + 0.325;
+      clusterDelay = 100;
+    } else {
+      clusterDelay -= 1;
+    }
+
+
     if (delay === 0){
-      cannons.push(new Cannon(ctx, canWidth, canHeight));
-      delay = 200;
+      cannons.push(new Cannon(ctx, canWidth, canHeight, clusterAngle));
+      delay = 10;
     } else {
       delay -= 1;
     }
@@ -64,18 +74,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cannons[i].status === 1) {
         cannons[i].drawCannon();
       }
-      if (cannons[i].status < 0 && cannons[i].status => -5 ){ //cannon to explode on shield
+      if (cannons[i].status < 0 && cannons[i].status > -5 ){ //cannon to explode on shield
         cannons[i].blockedExplosion();
         cannons[i].status += 1;
       }
       if (cannons[i].status === 0){ // status === 0 , remove cannon
-        toDelete.push(i);
+        cannons.splice(i, 1);
       }
     }
-    for (var i = toDelete.length - 1; i >= 0; i--) {
-      toDelete.splice(i, 1);
-      cannons.splice(toDelete[i], 1);
-    }
+
   }
 
 
