@@ -117,7 +117,7 @@ class Cannon {
     this.vx0 = v0 * Math.cos (angle);
 
     this.t = 0;
-    this.dt = 0.1;
+    this.dt = .1;
 
     this.x = this.vx0 * this.t + this.x0;
     this.y = (this.g * Math.pow(this.t, 2)) + (this.vy0 * this.t) + this.y0;
@@ -188,8 +188,8 @@ class Shield{
     this.canWidth = canWidth;
     this.canHeight = canHeight;
 
-    this.paddleHeight = 10;
-    this.paddleWidth = 75;
+    this.paddleHeight = 25;
+    this.paddleWidth = 200;
     this.paddleX = (this.canWidth-this.paddleWidth)/2;
 
   }
@@ -275,14 +275,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const cannons = [];
 
-
+  let delay = 0
   // create cannons
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
     guardianShield.moveShield(rightPressed, leftPressed);
 
-    cannons.push(new _components_cannon__WEBPACK_IMPORTED_MODULE_0__["default"](ctx, canWidth, canHeight));
+    if (delay === 0){
+      cannons.push(new _components_cannon__WEBPACK_IMPORTED_MODULE_0__["default"](ctx, canWidth, canHeight));
+      delay = 200;
+    } else {
+      delay -= 1;
+    }
+
+
     for (var i = 0; i < cannons.length; i++) {
       cannons[i].moveCannon(guardianShield);
       if (cannons[i].status) {

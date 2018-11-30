@@ -20,7 +20,7 @@ class Cannon {
     this.vx0 = v0 * Math.cos (angle);
 
     this.t = 0;
-    this.dt = 0.1;
+    this.dt = .1;
 
     this.x = this.vx0 * this.t + this.x0;
     this.y = (this.g * Math.pow(this.t, 2)) + (this.vy0 * this.t) + this.y0;

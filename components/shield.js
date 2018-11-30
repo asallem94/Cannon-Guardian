@@ -4,8 +4,8 @@ class Shield{
     this.canWidth = canWidth;
     this.canHeight = canHeight;
 
-    this.paddleHeight = 10;
-    this.paddleWidth = 75;
+    this.paddleHeight = 25;
+    this.paddleWidth = 200;
     this.paddleX = (this.canWidth-this.paddleWidth)/2;
 
   }

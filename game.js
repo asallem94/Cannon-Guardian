@@ -43,14 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const cannons = [];
 
-
+  let delay = 0
   // create cannons
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
     guardianShield.moveShield(rightPressed, leftPressed);
 
-    cannons.push(new Cannon(ctx, canWidth, canHeight));
+    if (delay === 0){
+      cannons.push(new Cannon(ctx, canWidth, canHeight));
+      delay = 200;
+    } else {
+      delay -= 1;
+    }
+
+
     for (var i = 0; i < cannons.length; i++) {
       cannons[i].moveCannon(guardianShield);
       if (cannons[i].status) {
