@@ -101,14 +101,17 @@ class Cannon {
     this.canHeight = canHeight;
     this.ctx = ctx;
     this.x0 = canWidth/2;
-    this.y0 = canHeight-30;
+    this.y0 = canHeight * 2/3;
 
     this.g = 1;
-    const v0 = -40;
+    const v0 = -35;
 
-    this.cannonRadius = 10;
+    this.cannonRadius = 1;
+    this.dr = 0.05;
 
-    const angle = Math.PI/3;
+    this.status = 1
+
+    const angle = Math.PI * Math.random();
 
     this.vy0 = v0 * Math.sin (angle);
     this.vx0 = v0 * Math.cos (angle);
@@ -129,25 +132,38 @@ class Cannon {
     this.ctx.closePath();
   }
 
-  moveBall(){
+  blockedExplosion(){
+    debugger
+    this.ctx.beginPath();
+    this.ctx.rect(this.x, this.y-10, 5, 15);
+    this.ctx.fillStyle = "yellow";
+    this.ctx.fill();
+    this.ctx.closePath();
+  }
+
+  moveCannon(guardianShield){
     this.t += this.dt;
+
+    this.cannonRadius += this.dr;
 
     this.x = this.vx0 * this.t + this.x0;
     this.y = (this.g * Math.pow(this.t, 2)) + (this.vy0 * this.t) + this.y0;
 
-
+    // bounce off walls
     if(this.x > this.canWidth - this.cannonRadius || this.x < this.cannonRadius) {
       this.x0 = (this.vx0 * this.t) + this.x;
       this.vx0 = -(this.vx0) ;
     }
 
-    // console.log(`y axis: ${y}`);
-    if(this.y < this.cannonRadius) {
-      this.y0 = this.y;
-      this.vy0 = -(2 * this.g * this.t);
-    } else if(y + dy > canvas.height-ballRadius) {
-      alert("GAME OVER");
-      document.location.reload();
+    if(this.y > this.canHeight + this.cannonRadius) {
+      if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
+        this.status = 0;
+        console.log("blocked");
+      }
+    }
+    if(this.y > this.canHeight + 2 * this.cannonRadius) {
+      // alert("GAME OVER");
+      // document.location.reload();
     }
   }
 }
@@ -257,17 +273,25 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener("keydown", guardianShield.keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
 
+  const cannons = [];
+
 
   // create cannons
-  const firstCannon = new _components_cannon__WEBPACK_IMPORTED_MODULE_0__["default"](ctx, canWidth, canHeight);
-
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
     guardianShield.moveShield(rightPressed, leftPressed);
 
-    firstCannon.drawCannon();
-    firstCannon.moveBall();
+    cannons.push(new _components_cannon__WEBPACK_IMPORTED_MODULE_0__["default"](ctx, canWidth, canHeight));
+    for (var i = 0; i < cannons.length; i++) {
+      cannons[i].moveCannon(guardianShield);
+      if (cannons[i].status) {
+        cannons[i].drawCannon();
+      }else{
+        cannons[i].blockedExplosion()
+      }
+    }
+
 
   }
 

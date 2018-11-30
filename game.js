@@ -41,17 +41,25 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener("keydown", guardianShield.keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
 
+  const cannons = [];
+
 
   // create cannons
-  const firstCannon = new Cannon(ctx, canWidth, canHeight);
-
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
     guardianShield.moveShield(rightPressed, leftPressed);
 
-    firstCannon.drawCannon();
-    firstCannon.moveBall();
+    cannons.push(new Cannon(ctx, canWidth, canHeight));
+    for (var i = 0; i < cannons.length; i++) {
+      cannons[i].moveCannon(guardianShield);
+      if (cannons[i].status) {
+        cannons[i].drawCannon();
+      }else{
+        cannons[i].blockedExplosion()
+      }
+    }
+
 
   }
 
