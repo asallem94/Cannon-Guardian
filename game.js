@@ -1,5 +1,6 @@
 import Cannon from './components/cannon';
 import Shield from './components/shield';
+import MyScoring from './components/scoring';
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvasElement = document.getElementById('canvasEl');
@@ -35,6 +36,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   }
 
+  function mouseMoveHandler(e) {
+    let relativeX = e.clientX - canvasElement.offsetLeft;
+    if(relativeX > 0 && relativeX < canvasElement.width) {
+        guardianShield.paddleX = relativeX - guardianShield.paddleWidth/2;
+    }
+  }
+
+  document.addEventListener("mousemove", mouseMoveHandler, false);
 
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
@@ -46,6 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let delay = 0;
   let clusterDelay = 0;
   let clusterAngle  = 0.3 * Math.random() + 0.3;
+
+  const myScoring = new MyScoring(ctx, canWidth);
 
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
@@ -69,8 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     for (var i = cannons.length-1; i >=0 ; i--) {
-      // debugger
-      cannons[i].moveCannon(guardianShield);
+      cannons[i].moveCannon(guardianShield, myScoring);
       if (cannons[i].status === 1) {
         cannons[i].drawCannon();
       }
@@ -82,6 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
         cannons.splice(i, 1);
       }
     }
+    myScoring.drawScore();
+    myScoring.drawLives();
+
 
   }
 

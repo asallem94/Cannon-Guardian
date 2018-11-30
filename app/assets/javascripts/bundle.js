@@ -127,9 +127,8 @@ class Cannon {
   }
 
   drawCannon(){
-    this.ctx.shadowOffsetY = 350-this.y+ 8*this.cannonRadius;
-    this.ctx.shadowColor= "rgba(0,0,0,0.5)";
-
+    // this.ctx.shadowOffsetY = 350-this.y+ 8*this.cannonRadius;
+    // this.ctx.shadowColor= "rgba(0,0,0,0.5)";
     this.ctx.beginPath();
     this.ctx.arc(this.x, this.y, this.cannonRadius, 0, Math.PI*2);
     this.ctx.fillStyle = "white" ;
@@ -163,7 +162,7 @@ class Cannon {
     this.ctx.closePath();
   }
 
-  moveCannon(guardianShield){
+  moveCannon(guardianShield, scoreKeeping){
     if (this.status < 0) {
       return null;
     }
@@ -185,19 +184,56 @@ class Cannon {
       if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
         // this.blockedExplosion();
         this.status = -2;
+        scoreKeeping.score ++;
       }
     }
 
-    // game over
+    // Lose life
     if(this.y > this.canHeight + 2 * this.cannonRadius) {
       this.status = 0;
-      // alert("GAME OVER");
-      // document.location.reload();
+      scoreKeeping.lives --;
+      if (scoreKeeping.lives === 0) {
+        alert("GAME OVER");
+        document.location.reload();
+      }
     }
   }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Cannon);
+
+
+/***/ }),
+
+/***/ "./components/scoring.js":
+/*!*******************************!*\
+  !*** ./components/scoring.js ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class Scoring {
+  constructor(ctx, canWidth){
+    this.score = 0;
+    this.ctx = ctx;
+    this.canWidth = canWidth;
+    this.lives = 10;
+  }
+  drawScore() {
+    this.ctx.font = "16px Arial";
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fillText("Score: "+this.score, 8, 20);
+  }
+  drawLives() {
+    this.ctx.font = "16px Arial";
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fillText("Lives: "+this.lives, this.canWidth-65, 20);
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Scoring);
 
 
 /***/ }),
@@ -259,6 +295,8 @@ class Shield{
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_cannon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/cannon */ "./components/cannon.js");
 /* harmony import */ var _components_shield__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/shield */ "./components/shield.js");
+/* harmony import */ var _components_scoring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/scoring */ "./components/scoring.js");
+
 
 
 
@@ -296,6 +334,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   }
 
+  function mouseMoveHandler(e) {
+    let relativeX = e.clientX - canvasElement.offsetLeft;
+    if(relativeX > 0 && relativeX < canvasElement.width) {
+        guardianShield.paddleX = relativeX - guardianShield.paddleWidth/2;
+    }
+  }
+
+  document.addEventListener("mousemove", mouseMoveHandler, false);
 
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
@@ -307,6 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let delay = 0;
   let clusterDelay = 0;
   let clusterAngle  = 0.3 * Math.random() + 0.3;
+
+  const myScoring = new _components_scoring__WEBPACK_IMPORTED_MODULE_2__["default"](ctx, canWidth);
 
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
@@ -330,8 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     for (var i = cannons.length-1; i >=0 ; i--) {
-      // debugger
-      cannons[i].moveCannon(guardianShield);
+      cannons[i].moveCannon(guardianShield, myScoring);
       if (cannons[i].status === 1) {
         cannons[i].drawCannon();
       }
@@ -343,6 +390,9 @@ document.addEventListener('DOMContentLoaded', () => {
         cannons.splice(i, 1);
       }
     }
+    myScoring.drawScore();
+    myScoring.drawLives();
+
 
   }
 

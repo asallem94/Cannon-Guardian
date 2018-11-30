@@ -30,9 +30,8 @@ class Cannon {
   }
 
   drawCannon(){
-    this.ctx.shadowOffsetY = 350-this.y+ 8*this.cannonRadius;
-    this.ctx.shadowColor= "rgba(0,0,0,0.5)";
-
+    // this.ctx.shadowOffsetY = 350-this.y+ 8*this.cannonRadius;
+    // this.ctx.shadowColor= "rgba(0,0,0,0.5)";
     this.ctx.beginPath();
     this.ctx.arc(this.x, this.y, this.cannonRadius, 0, Math.PI*2);
     this.ctx.fillStyle = "white" ;
@@ -66,7 +65,7 @@ class Cannon {
     this.ctx.closePath();
   }
 
-  moveCannon(guardianShield){
+  moveCannon(guardianShield, scoreKeeping){
     if (this.status < 0) {
       return null;
     }
@@ -88,14 +87,18 @@ class Cannon {
       if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
         // this.blockedExplosion();
         this.status = -2;
+        scoreKeeping.score ++;
       }
     }
 
-    // game over
+    // Lose life
     if(this.y > this.canHeight + 2 * this.cannonRadius) {
       this.status = 0;
-      // alert("GAME OVER");
-      // document.location.reload();
+      scoreKeeping.lives --;
+      if (scoreKeeping.lives === 0) {
+        alert("GAME OVER");
+        document.location.reload();
+      }
     }
   }
 }
