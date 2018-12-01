@@ -7,13 +7,13 @@ class Scoring {
   }
   drawScore() {
     this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "#0095DD";
-    this.ctx.fillText("Score: "+this.score, 8, 20);
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText("Score: "+this.score, 40, 20);
   }
   drawLives() {
     this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "#0095DD";
-    this.ctx.fillText("Lives: "+this.lives, this.canWidth-65, 20);
+    this.ctx.fillStyle = "#white";
+    this.ctx.fillText("Lives: "+this.lives, this.canWidth-100, 20);
   }
 }
 

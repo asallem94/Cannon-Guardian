@@ -1,5 +1,19 @@
 canvas {
-  background-color: lightblue;
+  /* background-color: lightblue; */
   display: block;
   margin: 0 auto;
+  border-left: 20px solid lightgray;
+  border-right: 20px solid lightgray;
+  border-radius: 10px;
+
+  /* background-size: cover; */
+  /* background-image: url("http://bdfjade.com/data/out/54/5613786-background-design.jpg"); */
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  /* background-color: black; */
+  background-image: url("https://ak4.picdn.net/shutterstock/videos/7755934/thumb/1.jpg");
 }

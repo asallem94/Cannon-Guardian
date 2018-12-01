@@ -85,7 +85,7 @@ class Cannon {
     // cannons explodes
     if(this.y >= this.canHeight - guardianShield.paddleHeight - this.cannonRadius && this.y <= this.canHeight) {
       if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
-        // this.blockedExplosion();
+        guardianShield.blockCannonAudio();
         this.status = -2;
         scoreKeeping.score ++;
       }
@@ -95,6 +95,7 @@ class Cannon {
     if(this.y > this.canHeight + 2 * this.cannonRadius) {
       this.status = 0;
       scoreKeeping.lives --;
+      guardianShield.blockCannonAudio();
       if (scoreKeeping.lives === 0) {
         alert("GAME OVER");
         document.location.reload();

@@ -182,7 +182,7 @@ class Cannon {
     // cannons explodes
     if(this.y >= this.canHeight - guardianShield.paddleHeight - this.cannonRadius && this.y <= this.canHeight) {
       if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
-        // this.blockedExplosion();
+        guardianShield.blockCannonAudio();
         this.status = -2;
         scoreKeeping.score ++;
       }
@@ -192,6 +192,7 @@ class Cannon {
     if(this.y > this.canHeight + 2 * this.cannonRadius) {
       this.status = 0;
       scoreKeeping.lives --;
+      guardianShield.blockCannonAudio();
       if (scoreKeeping.lives === 0) {
         alert("GAME OVER");
         document.location.reload();
@@ -223,13 +224,13 @@ class Scoring {
   }
   drawScore() {
     this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "#0095DD";
-    this.ctx.fillText("Score: "+this.score, 8, 20);
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText("Score: "+this.score, 40, 20);
   }
   drawLives() {
     this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "#0095DD";
-    this.ctx.fillText("Lives: "+this.lives, this.canWidth-65, 20);
+    this.ctx.fillStyle = "#white";
+    this.ctx.fillText("Lives: "+this.lives, this.canWidth-100, 20);
   }
 }
 
@@ -257,14 +258,39 @@ class Shield{
     this.paddleWidth = 200;
     this.paddleX = (this.canWidth-this.paddleWidth)/2;
 
+
+    this.blockingExplosion = document.getElementById('explosion2');
+    // new Audio("app/assets/audio/explosion2.mp3");
+    this.dieingExplosion = document.getElementById('explosion1');
+    // new Audio("app/assets/audio/explosion1.mp3");
   }
 
   drawShield() {
+
+    // const height3d = this.canHeight-this.paddleHeight;
+    // const refFactor = ( 2 * this.paddleHeight ) * (this.canHeight/2 - this.paddleX )/this.canHeight ;
+    // console.log(this.paddleX);
+    //
+    // this.ctx.moveTo(this.paddleX, height3d);
+    // this.ctx.lineTo(this.paddleX*2, height3d - this.paddleHeight);
+    // this.ctx.lineTo(this.paddleX/2 + this.paddleWidth/2 - refFactor, height3d - this.paddleHeight);
+    // this.ctx.lineTo(this.paddleX + this.paddleWidth, height3d);
+    // // this.ctx.lineTo(500,200);
+    // this.ctx.stroke();
+
     this.ctx.beginPath();
     this.ctx.rect(this.paddleX, this.canHeight-this.paddleHeight, this.paddleWidth, this.paddleHeight);
-    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fillStyle = "lightgray";
     this.ctx.fill();
     this.ctx.closePath();
+  }
+
+  looseLifeAudio(){
+    // this.dieingExplosion.play();
+  }
+
+  blockCannonAudio(){
+    // this.blockingExplosion.play();
   }
 
   moveShield(rightPressed, leftPressed){
@@ -284,6 +310,126 @@ class Shield{
 
 /***/ }),
 
+/***/ "./components/waves.js":
+/*!*****************************!*\
+  !*** ./components/waves.js ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _cannon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cannon */ "./components/cannon.js");
+
+
+class Waves{
+  constructor(ctx, canWidth, canHeight, clusterDelay, clusterAngle, intervalDelay = 0, waveDelay = 0){
+    this.ctx = ctx;
+    this.canWidth = canWidth;
+    this.canHeight = canHeight;
+    this.clusterDelay = clusterDelay;
+    this.clusterAngle = clusterAngle;
+    this.intervalDelay = intervalDelay;
+    this.waveDelay = waveDelay;
+    this.wave = 0;
+    this.cannons = [];
+
+    this.framesPerCannon = 25; //????
+    this.cannonsPerCluster = 1;
+    this.clustersPerWave = 2;
+    this.delayFramesBetweenWaves = 0;
+    this.delayFramesBetweenClusters= 0;
+    this.delayRatio = 20;
+  }
+
+  incrementClusterDelay(resetClusterDelay){
+    if (this.clusterDelay === 0){
+      this.clusterAngle  = 0.3 * Math.random() + 0.325;
+      this.clusterDelay = resetClusterDelay;
+      this.delayFramesBetweenClusters = this.delayRatio - Math.floor(this.wave/2);
+    } else {
+      this.clusterDelay -= 1;
+    }
+  }
+  incrementIntervalDelay(resetIntervalDelay){
+    if (this.intervalDelay === 0){
+      this.cannons.push(new _cannon__WEBPACK_IMPORTED_MODULE_0__["default"](this.ctx, this.canWidth, this.canHeight, this.clusterAngle));
+      this.intervalDelay = resetIntervalDelay;
+    } else {
+      this.intervalDelay -= 1;
+    }
+  }
+
+  incrementWaveDelay(resetWave, myScoring){
+    if (this.waveDelay === 0){
+
+      this.waveDelay = resetWave;
+      this.wave += 1;
+      myScoring.lives ++;
+      this.delayFramesBetweenWaves = this.delayRatio * 10;
+
+      if (this.wave % 2 === 1){
+        this.framesPerCannon = Math.floor(this.framesPerCannon * 0.9);
+      }
+      if (this.wave % 2 === 1){
+        this.cannonsPerCluster += 1;
+      }
+      if (this.wave % 3 === 1){
+        this.clustersPerWave += 1;
+      }
+
+      console.log("");
+    } else {
+      this.waveDelay -= 1;
+    }
+  }
+
+  drawWave(guardianShield, myScoring){
+    if (this.delayFramesBetweenWaves === 0){
+      if ( this.delayFramesBetweenClusters === 0){
+        this.incrementIntervalDelay(this.framesPerCannon); //create new cannon
+        this.incrementClusterDelay(this.cannonsPerCluster * this.framesPerCannon ); //cahange cannon cluster
+      } else {
+        this.delayFramesBetweenClusters -= 1;
+      }
+      this.incrementWaveDelay(this.clustersPerWave * this.cannonsPerCluster * this.framesPerCannon + this.delayFramesBetweenWaves, myScoring );
+    } else {
+      this.delayFramesBetweenWaves -= 1;
+    }
+
+    // draw all cannons in the frame
+    this.drawAttackingWave(guardianShield, myScoring);
+  }
+
+  drawWaveLabel(){
+    this.ctx.font = "32px Arial";
+    this.ctx.fillStyle = "#white";
+    this.ctx.fillText("Waves: "+this.wave, this.canWidth/2-75, 40);
+  }
+
+  drawAttackingWave(guardianShield, myScoring) {
+    for (let i = this.cannons.length-1; i >=0 ; i--) {
+      this.cannons[i].moveCannon(guardianShield, myScoring);
+      if (this.cannons[i].status === 1) {
+        this.cannons[i].drawCannon();
+      }
+      if (this.cannons[i].status < 0 && this.cannons[i].status > -5 ){ //cannon to explode on shield
+        this.cannons[i].blockedExplosion();
+        this.cannons[i].status += 1;
+      }
+      if (this.cannons[i].status === 0){ // status === 0 , remove cannon
+        this.cannons.splice(i, 1);
+      }
+    }
+  }
+}
+
+
+/* harmony default export */ __webpack_exports__["default"] = (Waves);
+
+
+/***/ }),
+
 /***/ "./game.js":
 /*!*****************!*\
   !*** ./game.js ***!
@@ -296,6 +442,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_cannon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/cannon */ "./components/cannon.js");
 /* harmony import */ var _components_shield__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/shield */ "./components/shield.js");
 /* harmony import */ var _components_scoring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/scoring */ "./components/scoring.js");
+/* harmony import */ var _components_waves__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/waves */ "./components/waves.js");
+
 
 
 
@@ -350,52 +498,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener("keyup", keyUpHandler, false);
 
   const cannons = [];
-  let delay = 0;
+  let intervalDelay = 0;
   let clusterDelay = 0;
   let clusterAngle  = 0.3 * Math.random() + 0.3;
 
   const myScoring = new _components_scoring__WEBPACK_IMPORTED_MODULE_2__["default"](ctx, canWidth);
+  const wave = new _components_waves__WEBPACK_IMPORTED_MODULE_3__["default"](ctx, canWidth, canHeight, clusterDelay, clusterAngle, intervalDelay, 0);
 
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
     guardianShield.moveShield(rightPressed, leftPressed);
 
-    if (clusterDelay === 0){
-      clusterAngle  = 0.3 * Math.random() + 0.325;
-      clusterDelay = 100;
-    } else {
-      clusterDelay -= 1;
-    }
+    wave.drawWave(guardianShield, myScoring);
 
-
-    if (delay === 0){
-      cannons.push(new _components_cannon__WEBPACK_IMPORTED_MODULE_0__["default"](ctx, canWidth, canHeight, clusterAngle));
-      delay = 10;
-    } else {
-      delay -= 1;
-    }
-
-
-    for (var i = cannons.length-1; i >=0 ; i--) {
-      cannons[i].moveCannon(guardianShield, myScoring);
-      if (cannons[i].status === 1) {
-        cannons[i].drawCannon();
-      }
-      if (cannons[i].status < 0 && cannons[i].status > -5 ){ //cannon to explode on shield
-        cannons[i].blockedExplosion();
-        cannons[i].status += 1;
-      }
-      if (cannons[i].status === 0){ // status === 0 , remove cannon
-        cannons.splice(i, 1);
-      }
-    }
     myScoring.drawScore();
     myScoring.drawLives();
-
-
+    wave.drawWaveLabel();
   }
-
 
   setInterval(draw, 10);
 });

@@ -1,6 +1,7 @@
 import Cannon from './components/cannon';
 import Shield from './components/shield';
 import MyScoring from './components/scoring';
+import Wave from './components/waves';
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvasElement = document.getElementById('canvasEl');
@@ -52,52 +53,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener("keyup", keyUpHandler, false);
 
   const cannons = [];
-  let delay = 0;
+  let intervalDelay = 0;
   let clusterDelay = 0;
   let clusterAngle  = 0.3 * Math.random() + 0.3;
 
   const myScoring = new MyScoring(ctx, canWidth);
+  const wave = new Wave(ctx, canWidth, canHeight, clusterDelay, clusterAngle, intervalDelay, 0);
 
   function draw() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
     guardianShield.moveShield(rightPressed, leftPressed);
 
-    if (clusterDelay === 0){
-      clusterAngle  = 0.3 * Math.random() + 0.325;
-      clusterDelay = 100;
-    } else {
-      clusterDelay -= 1;
-    }
+    wave.drawWave(guardianShield, myScoring);
 
-
-    if (delay === 0){
-      cannons.push(new Cannon(ctx, canWidth, canHeight, clusterAngle));
-      delay = 10;
-    } else {
-      delay -= 1;
-    }
-
-
-    for (var i = cannons.length-1; i >=0 ; i--) {
-      cannons[i].moveCannon(guardianShield, myScoring);
-      if (cannons[i].status === 1) {
-        cannons[i].drawCannon();
-      }
-      if (cannons[i].status < 0 && cannons[i].status > -5 ){ //cannon to explode on shield
-        cannons[i].blockedExplosion();
-        cannons[i].status += 1;
-      }
-      if (cannons[i].status === 0){ // status === 0 , remove cannon
-        cannons.splice(i, 1);
-      }
-    }
     myScoring.drawScore();
     myScoring.drawLives();
-
-
+    wave.drawWaveLabel();
   }
-
 
   setInterval(draw, 10);
 });
