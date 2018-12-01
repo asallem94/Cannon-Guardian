@@ -161,7 +161,10 @@ class Cannon {
     this.ctx.fill();
     this.ctx.closePath();
   }
-
+  looseLife(){
+    const background = document.getElementById('background');
+    background.classList.toggle()
+  }
   moveCannon(guardianShield, scoreKeeping){
     if (this.status < 0) {
       return null;
@@ -192,7 +195,8 @@ class Cannon {
     if(this.y > this.canHeight + 2 * this.cannonRadius) {
       this.status = 0;
       scoreKeeping.lives --;
-      guardianShield.blockCannonAudio();
+      guardianShield.looseLife();
+
       if (scoreKeeping.lives === 0) {
         alert("GAME OVER");
         document.location.reload();
@@ -249,14 +253,17 @@ class Scoring {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class Shield{
-  constructor(ctx, canWidth, canHeight){
+  constructor(ctx, canvasElement, canWidth, canHeight){
     this.ctx = ctx;
+    this.canvasElement = canvasElement;
     this.canWidth = canWidth;
     this.canHeight = canHeight;
 
     this.paddleHeight = 25;
     this.paddleWidth = 200;
     this.paddleX = (this.canWidth-this.paddleWidth)/2;
+
+    this.flashed = -1;
 
 
     this.blockingExplosion = document.getElementById('explosion2');
@@ -285,8 +292,12 @@ class Shield{
     this.ctx.closePath();
   }
 
-  looseLifeAudio(){
-    // this.dieingExplosion.play();
+  looseLife(){
+    // debugger
+    this.dieingExplosion.currentTime = 0
+    this.dieingExplosion.play();
+    this.canvasElement.classList.toggle("background-flash");
+    this.flashed = 2;
   }
 
   blockCannonAudio(){
@@ -336,7 +347,7 @@ class Waves{
 
     this.framesPerCannon = 25; //????
     this.cannonsPerCluster = 1;
-    this.clustersPerWave = 2;
+    this.clustersPerWave = 3;
     this.delayFramesBetweenWaves = 0;
     this.delayFramesBetweenClusters= 0;
     this.delayRatio = 20;
@@ -369,7 +380,7 @@ class Waves{
       this.delayFramesBetweenWaves = this.delayRatio * 10;
 
       if (this.wave % 2 === 1){
-        this.framesPerCannon = Math.floor(this.framesPerCannon * 0.9);
+        this.framesPerCannon = Math.floor(this.framesPerCannon * 0.75);
       }
       if (this.wave % 2 === 1){
         this.cannonsPerCluster += 1;
@@ -459,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
   canvasElement.height = canHeight;
 
   // create guardianShield
-  const guardianShield = new _components_shield__WEBPACK_IMPORTED_MODULE_1__["default"](ctx, canWidth, canHeight);
+  const guardianShield = new _components_shield__WEBPACK_IMPORTED_MODULE_1__["default"](ctx, canvasElement, canWidth, canHeight);
 
   let rightPressed;
   let leftPressed;
@@ -506,15 +517,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const wave = new _components_waves__WEBPACK_IMPORTED_MODULE_3__["default"](ctx, canWidth, canHeight, clusterDelay, clusterAngle, intervalDelay, 0);
 
   function draw() {
+    if (guardianShield.flashed > -1) {
+      guardianShield.flashed--;
+      if (guardianShield.flashed === -1){
+        canvasElement.classList.toggle("background-flash");
+      }
+    }
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
     guardianShield.moveShield(rightPressed, leftPressed);
+
 
     wave.drawWave(guardianShield, myScoring);
 
     myScoring.drawScore();
     myScoring.drawLives();
     wave.drawWaveLabel();
+
   }
 
   setInterval(draw, 10);

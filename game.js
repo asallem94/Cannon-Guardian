@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   canvasElement.height = canHeight;
 
   // create guardianShield
-  const guardianShield = new Shield(ctx, canWidth, canHeight);
+  const guardianShield = new Shield(ctx, canvasElement, canWidth, canHeight);
 
   let rightPressed;
   let leftPressed;
@@ -61,15 +61,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const wave = new Wave(ctx, canWidth, canHeight, clusterDelay, clusterAngle, intervalDelay, 0);
 
   function draw() {
+    if (guardianShield.flashed > -1) {
+      guardianShield.flashed--;
+      if (guardianShield.flashed === -1){
+        canvasElement.classList.toggle("background-flash");
+      }
+    }
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
     guardianShield.moveShield(rightPressed, leftPressed);
+
 
     wave.drawWave(guardianShield, myScoring);
 
     myScoring.drawScore();
     myScoring.drawLives();
     wave.drawWaveLabel();
+
   }
 
   setInterval(draw, 10);

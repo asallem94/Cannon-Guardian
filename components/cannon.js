@@ -64,7 +64,10 @@ class Cannon {
     this.ctx.fill();
     this.ctx.closePath();
   }
-
+  looseLife(){
+    const background = document.getElementById('background');
+    background.classList.toggle()
+  }
   moveCannon(guardianShield, scoreKeeping){
     if (this.status < 0) {
       return null;
@@ -95,7 +98,8 @@ class Cannon {
     if(this.y > this.canHeight + 2 * this.cannonRadius) {
       this.status = 0;
       scoreKeeping.lives --;
-      guardianShield.blockCannonAudio();
+      guardianShield.looseLife();
+
       if (scoreKeeping.lives === 0) {
         alert("GAME OVER");
         document.location.reload();

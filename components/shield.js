@@ -1,12 +1,15 @@
 class Shield{
-  constructor(ctx, canWidth, canHeight){
+  constructor(ctx, canvasElement, canWidth, canHeight){
     this.ctx = ctx;
+    this.canvasElement = canvasElement;
     this.canWidth = canWidth;
     this.canHeight = canHeight;
 
     this.paddleHeight = 25;
     this.paddleWidth = 200;
     this.paddleX = (this.canWidth-this.paddleWidth)/2;
+
+    this.flashed = -1;
 
 
     this.blockingExplosion = document.getElementById('explosion2');
@@ -35,8 +38,12 @@ class Shield{
     this.ctx.closePath();
   }
 
-  looseLifeAudio(){
-    // this.dieingExplosion.play();
+  looseLife(){
+    // debugger
+    this.dieingExplosion.currentTime = 0
+    this.dieingExplosion.play();
+    this.canvasElement.classList.toggle("background-flash");
+    this.flashed = 2;
   }
 
   blockCannonAudio(){

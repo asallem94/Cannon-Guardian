@@ -14,7 +14,7 @@ class Waves{
 
     this.framesPerCannon = 25; //????
     this.cannonsPerCluster = 1;
-    this.clustersPerWave = 2;
+    this.clustersPerWave = 3;
     this.delayFramesBetweenWaves = 0;
     this.delayFramesBetweenClusters= 0;
     this.delayRatio = 20;
@@ -47,7 +47,7 @@ class Waves{
       this.delayFramesBetweenWaves = this.delayRatio * 10;
 
       if (this.wave % 2 === 1){
-        this.framesPerCannon = Math.floor(this.framesPerCannon * 0.9);
+        this.framesPerCannon = Math.floor(this.framesPerCannon * 0.75);
       }
       if (this.wave % 2 === 1){
         this.cannonsPerCluster += 1;
