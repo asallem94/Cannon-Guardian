@@ -1,15 +1,17 @@
 class Cannon {
-  constructor( ctx, canWidth, canHeight, clusterAngle){
+  constructor( ctx, canWidth, canHeight, clusterAngle, openedModal){
     const colors = ["red", "green", "orange", "brown", "black", "blue", "purple","rgb(0,0,255)" , "lightblue" , "gray"];
     this.color = colors[Math.floor(Math.random()*10)];
     this.canWidth = canWidth;
     this.canHeight = canHeight;
     this.ctx = ctx;
     this.x0 = canWidth/2;
-    this.y0 = canHeight * 2/3;
+    this.y0 = canHeight * 1/2;
+
+    this.openedModal = openedModal;
 
     this.g = 1;
-    const v0 = -35;
+    const v0 = -27;
 
     this.cannonRadius = 1;
     this.dr = 0.05;
@@ -64,9 +66,32 @@ class Cannon {
     this.ctx.fill();
     this.ctx.closePath();
   }
-  looseLife(){
-    const background = document.getElementById('background');
-    background.classList.toggle()
+
+  checkForExplosion(guardianShield, scoreKeeping){
+    if(this.y >= this.canHeight - guardianShield.paddleHeight - this.cannonRadius && this.y <= this.canHeight) {
+      if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
+        if(!this.openedModal){
+          guardianShield.blockCannonAudio();
+        }
+        this.status = -2;
+        scoreKeeping.score ++;
+      }
+    }
+  }
+
+  handleLose(guardianShield, scoreKeeping ){
+    if(this.y > this.canHeight + 2 * this.cannonRadius) {
+      this.status = 0;
+      scoreKeeping.lives --;
+      if (!this.openedModal) {
+        guardianShield.looseLife();
+      }
+
+      if (scoreKeeping.lives === 0) {
+        scoreKeeping.resetGame(true, scoreKeeping.wave , scoreKeeping.score);
+
+      }
+    }
   }
   moveCannon(guardianShield, scoreKeeping){
     if (this.status < 0) {
@@ -86,25 +111,10 @@ class Cannon {
     }
 
     // cannons explodes
-    if(this.y >= this.canHeight - guardianShield.paddleHeight - this.cannonRadius && this.y <= this.canHeight) {
-      if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
-        guardianShield.blockCannonAudio();
-        this.status = -2;
-        scoreKeeping.score ++;
-      }
-    }
+    this.checkForExplosion(guardianShield, scoreKeeping);
 
     // Lose life
-    if(this.y > this.canHeight + 2 * this.cannonRadius) {
-      this.status = 0;
-      scoreKeeping.lives --;
-      guardianShield.looseLife();
-
-      if (scoreKeeping.lives === 0) {
-        alert("GAME OVER");
-        document.location.reload();
-      }
-    }
+    this.handleLose(guardianShield, scoreKeeping);
   }
 }
 

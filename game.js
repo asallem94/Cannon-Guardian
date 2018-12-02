@@ -2,16 +2,20 @@ import Cannon from './components/cannon';
 import Shield from './components/shield';
 import MyScoring from './components/scoring';
 import Wave from './components/waves';
+import GameControlls from './components/game_controls';
+
 
 document.addEventListener('DOMContentLoaded', () => {
+
   const canvasElement = document.getElementById('canvasEl');
   const ctx = canvasElement.getContext("2d");
 
-  const canWidth = 800;
-  const canHeight = 500;
+  const canWidth = document.getElementById('wallpaper').width * 0.60;
+  const canHeight = document.getElementById('wallpaper').height * 0.70;
 
   canvasElement.width = canWidth;
   canvasElement.height = canHeight;
+
 
   // create guardianShield
   const guardianShield = new Shield(ctx, canvasElement, canWidth, canHeight);
@@ -19,48 +23,27 @@ document.addEventListener('DOMContentLoaded', () => {
   let rightPressed;
   let leftPressed;
 
-  function keyDownHandler(e) {
-    if(e.keyCode == 39) {
-      rightPressed = true;
-    }
-    else if(e.keyCode == 37) {
-      leftPressed = true;
-    }
-  }
-
-  function keyUpHandler(e) {
-      if(e.keyCode == 39) {
-          rightPressed = false;
-      }
-      else if(e.keyCode == 37) {
-          leftPressed = false;
-      }
-  }
-
-  function mouseMoveHandler(e) {
-    let relativeX = e.clientX - canvasElement.offsetLeft;
-    if(relativeX > 0 && relativeX < canvasElement.width) {
-        guardianShield.paddleX = relativeX - guardianShield.paddleWidth/2;
-    }
-  }
-
-  document.addEventListener("mousemove", mouseMoveHandler, false);
-
-  document.addEventListener("keydown", keyDownHandler, false);
-  document.addEventListener("keyup", keyUpHandler, false);
-
-  document.addEventListener("keydown", guardianShield.keyDownHandler, false);
-  document.addEventListener("keyup", keyUpHandler, false);
+  const controls = new GameControlls(canvasElement, rightPressed, leftPressed, guardianShield);
 
   const cannons = [];
-  let intervalDelay = 0;
-  let clusterDelay = 0;
   let clusterAngle  = 0.3 * Math.random() + 0.3;
 
-  const myScoring = new MyScoring(ctx, canWidth);
-  const wave = new Wave(ctx, canWidth, canHeight, clusterDelay, clusterAngle, intervalDelay, 0);
+  let myScoring = new MyScoring(ctx, canWidth, canHeight);
+  let openedModal = true;
 
+  let wave = new Wave(ctx, canWidth, canHeight, openedModal,clusterAngle);
+
+  const resetGame = (modalOn, lastWave, lastScore) => {
+    openedModal = modalOn;
+    wave = new Wave(ctx, canWidth, canHeight, openedModal, clusterAngle);
+    myScoring = new MyScoring(ctx, canWidth, canHeight, resetGame, lastWave, lastScore);
+  };
+
+  canvasElement.onclick = ()=> {
+    resetGame(false);
+  };
   function draw() {
+
     if (guardianShield.flashed > -1) {
       guardianShield.flashed--;
       if (guardianShield.flashed === -1){
@@ -69,14 +52,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
-    guardianShield.moveShield(rightPressed, leftPressed);
+    guardianShield.moveShield(controls.rightPressed, controls.leftPressed);
 
 
     wave.drawWave(guardianShield, myScoring);
 
-    myScoring.drawScore();
-    myScoring.drawLives();
-    wave.drawWaveLabel();
+    if (openedModal) {
+      myScoring.displayModal()
+    } else {
+      myScoring.drawScore();
+      myScoring.drawLives();
+      wave.drawWaveLabel();
+    }
 
   }
 

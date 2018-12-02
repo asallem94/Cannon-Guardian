@@ -13,9 +13,8 @@ class Shield{
 
 
     this.blockingExplosion = document.getElementById('explosion2');
-    // new Audio("app/assets/audio/explosion2.mp3");
+    this.blockingExplosion.volume = 0.1;
     this.dieingExplosion = document.getElementById('explosion1');
-    // new Audio("app/assets/audio/explosion1.mp3");
   }
 
   drawShield() {
@@ -39,15 +38,15 @@ class Shield{
   }
 
   looseLife(){
-    // debugger
-    this.dieingExplosion.currentTime = 0
+    this.dieingExplosion.currentTime = 0;
     this.dieingExplosion.play();
     this.canvasElement.classList.toggle("background-flash");
     this.flashed = 2;
   }
 
   blockCannonAudio(){
-    // this.blockingExplosion.play();
+    this.blockingExplosion.currentTime = 0;
+    this.blockingExplosion.play();
   }
 
   moveShield(rightPressed, leftPressed){

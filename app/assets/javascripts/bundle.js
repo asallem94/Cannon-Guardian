@@ -96,17 +96,19 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class Cannon {
-  constructor( ctx, canWidth, canHeight, clusterAngle){
+  constructor( ctx, canWidth, canHeight, clusterAngle, openedModal){
     const colors = ["red", "green", "orange", "brown", "black", "blue", "purple","rgb(0,0,255)" , "lightblue" , "gray"];
     this.color = colors[Math.floor(Math.random()*10)];
     this.canWidth = canWidth;
     this.canHeight = canHeight;
     this.ctx = ctx;
     this.x0 = canWidth/2;
-    this.y0 = canHeight * 2/3;
+    this.y0 = canHeight * 1/2;
+
+    this.openedModal = openedModal;
 
     this.g = 1;
-    const v0 = -35;
+    const v0 = -27;
 
     this.cannonRadius = 1;
     this.dr = 0.05;
@@ -161,9 +163,32 @@ class Cannon {
     this.ctx.fill();
     this.ctx.closePath();
   }
-  looseLife(){
-    const background = document.getElementById('background');
-    background.classList.toggle()
+
+  checkForExplosion(guardianShield, scoreKeeping){
+    if(this.y >= this.canHeight - guardianShield.paddleHeight - this.cannonRadius && this.y <= this.canHeight) {
+      if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
+        if(!this.openedModal){
+          guardianShield.blockCannonAudio();
+        }
+        this.status = -2;
+        scoreKeeping.score ++;
+      }
+    }
+  }
+
+  handleLose(guardianShield, scoreKeeping ){
+    if(this.y > this.canHeight + 2 * this.cannonRadius) {
+      this.status = 0;
+      scoreKeeping.lives --;
+      if (!this.openedModal) {
+        guardianShield.looseLife();
+      }
+
+      if (scoreKeeping.lives === 0) {
+        scoreKeeping.resetGame(true, scoreKeeping.wave , scoreKeeping.score);
+
+      }
+    }
   }
   moveCannon(guardianShield, scoreKeeping){
     if (this.status < 0) {
@@ -183,29 +208,85 @@ class Cannon {
     }
 
     // cannons explodes
-    if(this.y >= this.canHeight - guardianShield.paddleHeight - this.cannonRadius && this.y <= this.canHeight) {
-      if(this.x > guardianShield.paddleX && this.x < guardianShield.paddleX + guardianShield.paddleWidth) {
-        guardianShield.blockCannonAudio();
-        this.status = -2;
-        scoreKeeping.score ++;
-      }
-    }
+    this.checkForExplosion(guardianShield, scoreKeeping);
 
     // Lose life
-    if(this.y > this.canHeight + 2 * this.cannonRadius) {
-      this.status = 0;
-      scoreKeeping.lives --;
-      guardianShield.looseLife();
-
-      if (scoreKeeping.lives === 0) {
-        alert("GAME OVER");
-        document.location.reload();
-      }
-    }
+    this.handleLose(guardianShield, scoreKeeping);
   }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Cannon);
+
+
+/***/ }),
+
+/***/ "./components/game_controls.js":
+/*!*************************************!*\
+  !*** ./components/game_controls.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class GameControls {
+  constructor(canvasElement, rightPressed, leftPressed, guardianShield){
+    this.canvasElement = canvasElement;
+    this.rightPressed = rightPressed;
+    this.leftPressed = leftPressed;
+    this.guardianShield = guardianShield;
+
+
+    document.getElementById('volume').onclick = this.handleSound;
+
+    document.addEventListener("mousemove", this.mouseMoveHandler.bind(this), false);
+
+    document.addEventListener("keydown", this.keyDownHandler, false);
+    document.addEventListener("keyup", this.keyUpHandler, false);
+
+    document.addEventListener("keydown", guardianShield.keyDownHandler, false);
+    document.addEventListener("keyup", this.keyUpHandler, false);
+  }
+
+  handleSound(){
+    document.getElementById('nosound').classList.toggle("muted");
+    document.getElementById('sound').classList.toggle("muted");
+
+    document.getElementById('explosion1').muted = document.getElementById('explosion1').muted ? false : true;
+    document.getElementById('explosion2').muted = document.getElementById('explosion2').muted ? false : true;
+    document.getElementById('background-song').muted = document.getElementById('background-song').muted ? false : true;
+    document.getElementById('background-song').play();
+  }
+
+  keyDownHandler(e) {
+    // debugger
+    if(e.keyCode == 39) {
+      this.rightPressed = true;
+    }
+    else if(e.keyCode == 37) {
+      this.leftPressed = true;
+    }
+  }
+
+  keyUpHandler(e) {
+    if(e.keyCode == 39) {
+      this.rightPressed = false;
+    }
+    else if(e.keyCode == 37) {
+      this.leftPressed = false;
+    }
+  }
+
+  mouseMoveHandler(e) {
+    let relativeX = e.clientX - this.canvasElement.offsetLeft;
+    if(relativeX > 0 && relativeX < this.canvasElement.width) {
+      this.guardianShield.paddleX = relativeX - this.guardianShield.paddleWidth/2;
+    }
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (GameControls);
 
 
 /***/ }),
@@ -220,21 +301,51 @@ class Cannon {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class Scoring {
-  constructor(ctx, canWidth){
+  constructor(ctx, canWidth, canHeight, resetGame, lastWave=0, lastScore=0){
     this.score = 0;
+    this.wave = 0;
     this.ctx = ctx;
     this.canWidth = canWidth;
+    this.canHeight = canHeight;
+    this.resetGame = resetGame;
+    this.lastWave=lastWave;
+    this.lastScore=lastScore;
     this.lives = 10;
+
   }
   drawScore() {
-    this.ctx.font = "16px Arial";
+    this.ctx.font = "1.5em Arial";
     this.ctx.fillStyle = "white";
-    this.ctx.fillText("Score: "+this.score, 40, 20);
+    this.ctx.fillText("Score: "+this.score, 80, 20);
   }
   drawLives() {
-    this.ctx.font = "16px Arial";
+    this.ctx.font = "1.5em Arial";
     this.ctx.fillStyle = "#white";
-    this.ctx.fillText("Lives: "+this.lives, this.canWidth-100, 20);
+    this.ctx.fillText("Lives: "+this.lives, this.canWidth-80, 20);
+  }
+
+  displayModal(){
+    const topPadding = this.canHeight/3;
+    // display Instructions
+    this.ctx.lineWidth = 3;
+    this.ctx.font = "2.5em Arial";
+    this.ctx.strokeStyle = 'black';
+    this.ctx.strokeText("Click to Start", this.canWidth/2, 80+topPadding);
+    this.ctx.fillStyle = "#white";
+    this.ctx.textAlign = "center";
+    this.ctx.fillText("Click to Start", this.canWidth/2, 80+topPadding);
+    // display wave
+    this.ctx.font = "1.5em Arial";
+    this.ctx.strokeStyle = 'black';
+    this.ctx.strokeText("Wave: "+this.lastWave, this.canWidth/2, 120+topPadding);
+    this.ctx.fillStyle = "#white";
+    this.ctx.fillText("Wave: "+this.lastWave, this.canWidth/2, 120+topPadding);
+    // display score
+    this.ctx.font = "1.5em Arial";
+    this.ctx.strokeStyle = 'black';
+    this.ctx.strokeText("Score: "+this.lastScore, this.canWidth/2, 160+topPadding);
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText("Score: "+this.lastScore, this.canWidth/2, 160+topPadding);
   }
 }
 
@@ -267,9 +378,8 @@ class Shield{
 
 
     this.blockingExplosion = document.getElementById('explosion2');
-    // new Audio("app/assets/audio/explosion2.mp3");
+    this.blockingExplosion.volume = 0.1;
     this.dieingExplosion = document.getElementById('explosion1');
-    // new Audio("app/assets/audio/explosion1.mp3");
   }
 
   drawShield() {
@@ -293,15 +403,15 @@ class Shield{
   }
 
   looseLife(){
-    // debugger
-    this.dieingExplosion.currentTime = 0
+    this.dieingExplosion.currentTime = 0;
     this.dieingExplosion.play();
     this.canvasElement.classList.toggle("background-flash");
     this.flashed = 2;
   }
 
   blockCannonAudio(){
-    // this.blockingExplosion.play();
+    this.blockingExplosion.currentTime = 0;
+    this.blockingExplosion.play();
   }
 
   moveShield(rightPressed, leftPressed){
@@ -334,23 +444,34 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Waves{
-  constructor(ctx, canWidth, canHeight, clusterDelay, clusterAngle, intervalDelay = 0, waveDelay = 0){
+  constructor(ctx, canWidth, canHeight, openedModal, clusterAngle){
     this.ctx = ctx;
     this.canWidth = canWidth;
     this.canHeight = canHeight;
-    this.clusterDelay = clusterDelay;
+    this.clusterDelay = 0;
     this.clusterAngle = clusterAngle;
-    this.intervalDelay = intervalDelay;
-    this.waveDelay = waveDelay;
+    this.intervalDelay = 0;
+    this.waveDelay = 0;
     this.wave = 0;
     this.cannons = [];
 
-    this.framesPerCannon = 25; //????
+    this.framesPerCannon = openedModal ? 0 : 25 ; //????
     this.cannonsPerCluster = 1;
-    this.clustersPerWave = 3;
-    this.delayFramesBetweenWaves = 0;
+    this.clustersPerWave = 1;
     this.delayFramesBetweenClusters= 0;
     this.delayRatio = 20;
+
+    this.openedModal = openedModal;
+    this.currentWave = true;
+  }
+
+  incrementIntervalDelay(resetIntervalDelay){
+    if (this.intervalDelay === 0){
+      this.cannons.push(new _cannon__WEBPACK_IMPORTED_MODULE_0__["default"](this.ctx, this.canWidth, this.canHeight, this.clusterAngle, this.openedModal));
+      this.intervalDelay = resetIntervalDelay;
+    } else {
+      this.intervalDelay -= 1;
+    }
   }
 
   incrementClusterDelay(resetClusterDelay){
@@ -362,14 +483,6 @@ class Waves{
       this.clusterDelay -= 1;
     }
   }
-  incrementIntervalDelay(resetIntervalDelay){
-    if (this.intervalDelay === 0){
-      this.cannons.push(new _cannon__WEBPACK_IMPORTED_MODULE_0__["default"](this.ctx, this.canWidth, this.canHeight, this.clusterAngle));
-      this.intervalDelay = resetIntervalDelay;
-    } else {
-      this.intervalDelay -= 1;
-    }
-  }
 
   incrementWaveDelay(resetWave, myScoring){
     if (this.waveDelay === 0){
@@ -377,10 +490,11 @@ class Waves{
       this.waveDelay = resetWave;
       this.wave += 1;
       myScoring.lives ++;
-      this.delayFramesBetweenWaves = this.delayRatio * 10;
+      myScoring.wave = this.wave
+      this.currentWave = false;
 
       if (this.wave % 2 === 1){
-        this.framesPerCannon = Math.floor(this.framesPerCannon * 0.75);
+        this.framesPerCannon = Math.floor(this.framesPerCannon * 0.9);
       }
       if (this.wave % 2 === 1){
         this.cannonsPerCluster += 1;
@@ -388,34 +502,31 @@ class Waves{
       if (this.wave % 3 === 1){
         this.clustersPerWave += 1;
       }
-
-      console.log("");
     } else {
       this.waveDelay -= 1;
     }
   }
 
   drawWave(guardianShield, myScoring){
-    if (this.delayFramesBetweenWaves === 0){
-      if ( this.delayFramesBetweenClusters === 0){
+    // if (this.waveIncrease){
+      // if ( this.delayFramesBetweenClusters === 0){
         this.incrementIntervalDelay(this.framesPerCannon); //create new cannon
-        this.incrementClusterDelay(this.cannonsPerCluster * this.framesPerCannon ); //cahange cannon cluster
-      } else {
-        this.delayFramesBetweenClusters -= 1;
-      }
-      this.incrementWaveDelay(this.clustersPerWave * this.cannonsPerCluster * this.framesPerCannon + this.delayFramesBetweenWaves, myScoring );
-    } else {
-      this.delayFramesBetweenWaves -= 1;
-    }
+        this.incrementClusterDelay(this.cannonsPerCluster * this.framesPerCannon ); //cahange cannon cluster direction
+      // } else {
+      //   this.delayFramesBetweenClusters -= 1;
+      // }
+      this.incrementWaveDelay(this.clustersPerWave * this.cannonsPerCluster * this.framesPerCannon, myScoring );
+      this.currentWave = true;
+    // }
 
     // draw all cannons in the frame
     this.drawAttackingWave(guardianShield, myScoring);
   }
 
   drawWaveLabel(){
-    this.ctx.font = "32px Arial";
+    this.ctx.font = "2.5em Arial";
     this.ctx.fillStyle = "#white";
-    this.ctx.fillText("Waves: "+this.wave, this.canWidth/2-75, 40);
+    this.ctx.fillText("Wave: "+this.wave, this.canWidth/2, 80);
   }
 
   drawAttackingWave(guardianShield, myScoring) {
@@ -454,20 +565,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_shield__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/shield */ "./components/shield.js");
 /* harmony import */ var _components_scoring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/scoring */ "./components/scoring.js");
 /* harmony import */ var _components_waves__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/waves */ "./components/waves.js");
+/* harmony import */ var _components_game_controls__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/game_controls */ "./components/game_controls.js");
+
+
 
 
 
 
 
 document.addEventListener('DOMContentLoaded', () => {
+
   const canvasElement = document.getElementById('canvasEl');
   const ctx = canvasElement.getContext("2d");
 
-  const canWidth = 800;
-  const canHeight = 500;
+  const canWidth = document.getElementById('wallpaper').width * 0.60;
+  const canHeight = document.getElementById('wallpaper').height * 0.70;
 
   canvasElement.width = canWidth;
   canvasElement.height = canHeight;
+
 
   // create guardianShield
   const guardianShield = new _components_shield__WEBPACK_IMPORTED_MODULE_1__["default"](ctx, canvasElement, canWidth, canHeight);
@@ -475,48 +591,27 @@ document.addEventListener('DOMContentLoaded', () => {
   let rightPressed;
   let leftPressed;
 
-  function keyDownHandler(e) {
-    if(e.keyCode == 39) {
-      rightPressed = true;
-    }
-    else if(e.keyCode == 37) {
-      leftPressed = true;
-    }
-  }
-
-  function keyUpHandler(e) {
-      if(e.keyCode == 39) {
-          rightPressed = false;
-      }
-      else if(e.keyCode == 37) {
-          leftPressed = false;
-      }
-  }
-
-  function mouseMoveHandler(e) {
-    let relativeX = e.clientX - canvasElement.offsetLeft;
-    if(relativeX > 0 && relativeX < canvasElement.width) {
-        guardianShield.paddleX = relativeX - guardianShield.paddleWidth/2;
-    }
-  }
-
-  document.addEventListener("mousemove", mouseMoveHandler, false);
-
-  document.addEventListener("keydown", keyDownHandler, false);
-  document.addEventListener("keyup", keyUpHandler, false);
-
-  document.addEventListener("keydown", guardianShield.keyDownHandler, false);
-  document.addEventListener("keyup", keyUpHandler, false);
+  const controls = new _components_game_controls__WEBPACK_IMPORTED_MODULE_4__["default"](canvasElement, rightPressed, leftPressed, guardianShield);
 
   const cannons = [];
-  let intervalDelay = 0;
-  let clusterDelay = 0;
   let clusterAngle  = 0.3 * Math.random() + 0.3;
 
-  const myScoring = new _components_scoring__WEBPACK_IMPORTED_MODULE_2__["default"](ctx, canWidth);
-  const wave = new _components_waves__WEBPACK_IMPORTED_MODULE_3__["default"](ctx, canWidth, canHeight, clusterDelay, clusterAngle, intervalDelay, 0);
+  let myScoring = new _components_scoring__WEBPACK_IMPORTED_MODULE_2__["default"](ctx, canWidth, canHeight);
+  let openedModal = true;
 
+  let wave = new _components_waves__WEBPACK_IMPORTED_MODULE_3__["default"](ctx, canWidth, canHeight, openedModal,clusterAngle);
+
+  const resetGame = (modalOn, lastWave, lastScore) => {
+    openedModal = modalOn;
+    wave = new _components_waves__WEBPACK_IMPORTED_MODULE_3__["default"](ctx, canWidth, canHeight, openedModal, clusterAngle);
+    myScoring = new _components_scoring__WEBPACK_IMPORTED_MODULE_2__["default"](ctx, canWidth, canHeight, resetGame, lastWave, lastScore);
+  };
+
+  canvasElement.onclick = ()=> {
+    resetGame(false);
+  };
   function draw() {
+
     if (guardianShield.flashed > -1) {
       guardianShield.flashed--;
       if (guardianShield.flashed === -1){
@@ -525,14 +620,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     ctx.clearRect(0, 0, canWidth, canHeight);
     guardianShield.drawShield();
-    guardianShield.moveShield(rightPressed, leftPressed);
+    guardianShield.moveShield(controls.rightPressed, controls.leftPressed);
 
 
     wave.drawWave(guardianShield, myScoring);
 
-    myScoring.drawScore();
-    myScoring.drawLives();
-    wave.drawWaveLabel();
+    if (openedModal) {
+      myScoring.displayModal()
+    } else {
+      myScoring.drawScore();
+      myScoring.drawLives();
+      wave.drawWaveLabel();
+    }
 
   }
 
