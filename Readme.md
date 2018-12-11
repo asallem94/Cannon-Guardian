@@ -13,7 +13,7 @@ move the shield left and right by clicking the left and right arrow keys or scro
 
 * Every cannon blocked is an additional 1 point to your score. The more points you recieve, the more love you get from the people of your universe.
 
-## Each wave of cannons gets harder and harder, but your universe has entrusted you to save it.  Good luck
+## Each wave of cannons gets harder and harder, but your universe has entrusted you to save it.  Good luck !!!
 
 ![alt text](https://github.com/asallem94/Cannon-Guardian/blob/master/app/assets/videos/cg_gif.gif "gif demo")
 
