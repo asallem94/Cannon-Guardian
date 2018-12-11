@@ -150,14 +150,14 @@ class Cannon {
     this.ctx.closePath();
 
     this.ctx.beginPath();
-    this.ctx.arc(this.x, this.y-3, this.cannonRadius-3, 0, Math.PI*2);
+    this.ctx.arc(this.x, this.y-3, this.cannonRadius*0.8, 0, Math.PI*2);
     this.ctx.fillStyle = "yellow";
     this.ctx.lineWidth = 5;
     this.ctx.fill();
     this.ctx.closePath();
 
     this.ctx.beginPath();
-    this.ctx.arc(this.x +5 * Math.random(), this.y + (4 * Math.random()), this.cannonRadius-14, 0, Math.PI*2);
+    this.ctx.arc(this.x +5 * Math.random(), this.y + (4 * Math.random()), this.cannonRadius*0.2, 0, Math.PI*2);
     this.ctx.fillStyle = "red";
     this.ctx.lineWidth = 2;
     this.ctx.fill();
@@ -230,10 +230,10 @@ class Cannon {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class GameControls {
-  constructor(canvasElement, rightPressed, leftPressed, guardianShield){
+  constructor(canvasElement, guardianShield){
     this.canvasElement = canvasElement;
-    this.rightPressed = rightPressed;
-    this.leftPressed = leftPressed;
+    this.rightPressed = false;
+    this.leftPressed = false;
     this.guardianShield = guardianShield;
 
 
@@ -241,11 +241,9 @@ class GameControls {
 
     document.addEventListener("mousemove", this.mouseMoveHandler.bind(this), false);
 
-    document.addEventListener("keydown", this.keyDownHandler, false);
-    document.addEventListener("keyup", this.keyUpHandler, false);
+    document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
+    document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
 
-    document.addEventListener("keydown", guardianShield.keyDownHandler, false);
-    document.addEventListener("keyup", this.keyUpHandler, false);
   }
 
   handleSound(){
@@ -259,7 +257,8 @@ class GameControls {
   }
 
   keyDownHandler(e) {
-    // debugger
+    e.preventDefault();
+
     if(e.keyCode == 39) {
       this.rightPressed = true;
     }
@@ -269,6 +268,7 @@ class GameControls {
   }
 
   keyUpHandler(e) {
+    e.preventDefault();
     if(e.keyCode == 39) {
       this.rightPressed = false;
     }
@@ -588,10 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // create guardianShield
   const guardianShield = new _components_shield__WEBPACK_IMPORTED_MODULE_1__["default"](ctx, canvasElement, canWidth, canHeight);
 
-  let rightPressed;
-  let leftPressed;
-
-  const controls = new _components_game_controls__WEBPACK_IMPORTED_MODULE_4__["default"](canvasElement, rightPressed, leftPressed, guardianShield);
+  const controls = new _components_game_controls__WEBPACK_IMPORTED_MODULE_4__["default"](canvasElement, guardianShield);
 
   const cannons = [];
   let clusterAngle  = 0.3 * Math.random() + 0.3;
@@ -625,13 +622,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     wave.drawWave(guardianShield, myScoring);
 
-    if (openedModal) {
-      myScoring.displayModal()
-    } else {
-      myScoring.drawScore();
-      myScoring.drawLives();
-      wave.drawWaveLabel();
-    }
+    // if (openedModal) {
+    //   myScoring.displayModal();
+    // } else {
+    //   myScoring.drawScore();
+    //   myScoring.drawLives();
+    //   wave.drawWaveLabel();
+    // }
 
   }
 

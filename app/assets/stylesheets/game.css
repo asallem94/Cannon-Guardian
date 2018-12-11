@@ -27,6 +27,15 @@ a {
   align-items: center;
 }
 
+.title {
+  font-family: sans-serif;
+  color: white;
+  /* background-color: black; */
+  margin: 0;
+  position: absolute;
+  top: 10%;
+}
+
 .layout {
   position: absolute;
   right: 0;

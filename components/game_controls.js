@@ -1,8 +1,8 @@
 class GameControls {
-  constructor(canvasElement, rightPressed, leftPressed, guardianShield){
+  constructor(canvasElement, guardianShield){
     this.canvasElement = canvasElement;
-    this.rightPressed = rightPressed;
-    this.leftPressed = leftPressed;
+    this.rightPressed = false;
+    this.leftPressed = false;
     this.guardianShield = guardianShield;
 
 
@@ -10,14 +10,8 @@ class GameControls {
 
     document.addEventListener("mousemove", this.mouseMoveHandler.bind(this), false);
 
-    document.addEventListener("keydown", this.keyDownHandler, false);
-    document.addEventListener("keyup", this.keyUpHandler, false);
-
-    document.addEventListener("keydown", guardianShield.keyDownHandler, false);
-    document.addEventListener("keyup", this.keyUpHandler, false);
-
-    this.keyDownHandler = this.keyDownHandler.bind(this);
-    this.keyUpHandler = this.keyUpHandler.bind(this);
+    document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
+    document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
 
   }
 
@@ -33,6 +27,7 @@ class GameControls {
 
   keyDownHandler(e) {
     e.preventDefault();
+
     if(e.keyCode == 39) {
       this.rightPressed = true;
     }
