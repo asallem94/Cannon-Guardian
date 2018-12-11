@@ -1,6 +1,6 @@
 Cannon Guardian is a javascript game where the Guardian must protect from any cannons passing with his powerful shield.
 
-![alt text](https://github.com/asallem94/Cannon-Guardian/app/assets/videos/cg_gif.gif "Logo Title Text 1")
+![alt text](https://github.com/asallem94/Cannon-Guardian/blob/master/app/assets/videos/cg_gif.gif "gif demo")
 
 
 MVP:
