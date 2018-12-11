@@ -15,6 +15,10 @@ class GameControls {
 
     document.addEventListener("keydown", guardianShield.keyDownHandler, false);
     document.addEventListener("keyup", this.keyUpHandler, false);
+
+    this.keyDownHandler = this.keyDownHandler.bind(this);
+    this.keyUpHandler = this.keyUpHandler.bind(this);
+
   }
 
   handleSound(){
@@ -28,7 +32,7 @@ class GameControls {
   }
 
   keyDownHandler(e) {
-    // debugger
+    e.preventDefault();
     if(e.keyCode == 39) {
       this.rightPressed = true;
     }
@@ -38,6 +42,7 @@ class GameControls {
   }
 
   keyUpHandler(e) {
+    e.preventDefault();
     if(e.keyCode == 39) {
       this.rightPressed = false;
     }
