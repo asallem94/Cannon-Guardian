@@ -1,5 +1,7 @@
 Cannon Guardian is a javascript game where the Guardian must protect from any cannons passing with his powerful shield.
 
+(https://asallem94.github.io/Cannon-Guardian/cannon_guardian)
+
 The year is 2500. You are the guardian protecting the universe from cannons that are entering the dimension to you universe.
 
 # Instructions:
@@ -17,4 +19,4 @@ move the shield left and right by clicking the left and right arrow keys or scro
 
 ![alt text](https://github.com/asallem94/Cannon-Guardian/blob/master/app/assets/videos/cg_gif.gif "gif demo")
 
-(https://asallem94.github.io/Cannon-Guardian/cannon_guardian)
+
