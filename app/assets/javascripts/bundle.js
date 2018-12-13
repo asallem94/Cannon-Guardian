@@ -612,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (guardianShield.flashed > -1) {
       guardianShield.flashed--;
       if (guardianShield.flashed === -1){
-        canvasElement.classList.toggle("background-flash");
+        canvasElement.classList.remove("background-flash");
       }
     }
     ctx.clearRect(0, 0, canWidth, canHeight);
