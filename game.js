@@ -31,13 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
   let wave = new Wave(ctx, canWidth, canHeight, openedModal,clusterAngle);
 
   const resetGame = (modalOn, lastWave, lastScore) => {
+
     openedModal = modalOn;
     wave = new Wave(ctx, canWidth, canHeight, openedModal, clusterAngle);
     myScoring = new MyScoring(ctx, canWidth, canHeight, resetGame, lastWave, lastScore);
   };
 
   canvasElement.onclick = ()=> {
-    resetGame(false);
+    if (openedModal){
+      resetGame(false);
+    }
   };
   function draw() {
 

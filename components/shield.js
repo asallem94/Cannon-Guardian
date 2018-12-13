@@ -50,7 +50,7 @@ class Shield{
   }
 
   moveShield(rightPressed, leftPressed){
-    const sensitivity = 20;
+    const sensitivity = 15;
 
     if(rightPressed && this.paddleX < this.canWidth-this.paddleWidth) {
       this.paddleX += sensitivity;

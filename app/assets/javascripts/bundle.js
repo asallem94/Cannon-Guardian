@@ -415,7 +415,7 @@ class Shield{
   }
 
   moveShield(rightPressed, leftPressed){
-    const sensitivity = 20;
+    const sensitivity = 15;
 
     if(rightPressed && this.paddleX < this.canWidth-this.paddleWidth) {
       this.paddleX += sensitivity;
@@ -599,13 +599,16 @@ document.addEventListener('DOMContentLoaded', () => {
   let wave = new _components_waves__WEBPACK_IMPORTED_MODULE_3__["default"](ctx, canWidth, canHeight, openedModal,clusterAngle);
 
   const resetGame = (modalOn, lastWave, lastScore) => {
+
     openedModal = modalOn;
     wave = new _components_waves__WEBPACK_IMPORTED_MODULE_3__["default"](ctx, canWidth, canHeight, openedModal, clusterAngle);
     myScoring = new _components_scoring__WEBPACK_IMPORTED_MODULE_2__["default"](ctx, canWidth, canHeight, resetGame, lastWave, lastScore);
   };
 
   canvasElement.onclick = ()=> {
-    resetGame(false);
+    if (openedModal){
+      resetGame(false);
+    }
   };
   function draw() {
 
