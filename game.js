@@ -54,13 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     wave.drawWave(guardianShield, myScoring);
 
-    // if (openedModal) {
-    //   myScoring.displayModal();
-    // } else {
-    //   myScoring.drawScore();
-    //   myScoring.drawLives();
-    //   wave.drawWaveLabel();
-    // }
+    if (openedModal) {
+      myScoring.displayModal();
+    } else {
+      myScoring.drawScore();
+      myScoring.drawLives();
+      wave.drawWaveLabel();
+    }
 
   }
 
