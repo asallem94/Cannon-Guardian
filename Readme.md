@@ -19,4 +19,29 @@ move the shield left and right by clicking the left and right arrow keys or scro
 
 ![alt text](https://github.com/asallem94/Cannon-Guardian/blob/master/app/assets/videos/cg_gif.gif "gif demo")
 
+###For developers a little inside on the wave generation:
+
+Every ten miliseconds a the attacking wave is regenerated with an array of cannon objects
+Each cannon object is rendered after looping through all the created cannons.  if a cannon falls of the bottom of the screen or collides with the shield it is removed from the array and will never be rendered again.
+
+Below is a code snippet to demonstrate the recreation of each cannon on each frame being rendered: 
+
+`
+drawAttackingWave(guardianShield, myScoring) {
+  for (let i = this.cannons.length-1; i >=0 ; i--) {
+    this.cannons[i].moveCannon(guardianShield, myScoring);
+    if (this.cannons[i].status === 1) {
+      this.cannons[i].drawCannon();
+    }
+    if (this.cannons[i].status < 0 && this.cannons[i].status > -5 ){ //cannon to explode on shield
+      this.cannons[i].blockedExplosion();
+      this.cannons[i].status += 1;
+    }
+    if (this.cannons[i].status === 0){ // status === 0 , remove cannon
+      this.cannons.splice(i, 1);
+    }
+  }
+}
+`
+
 
