@@ -26,7 +26,7 @@ Each cannon object is rendered after looping through all the created cannons.  i
 
 Below is a code snippet to demonstrate the recreation of each cannon on each frame being rendered: 
 
-`
+```
 drawAttackingWave(guardianShield, myScoring) {
   for (let i = this.cannons.length-1; i >=0 ; i--) {
     this.cannons[i].moveCannon(guardianShield, myScoring);
@@ -42,6 +42,6 @@ drawAttackingWave(guardianShield, myScoring) {
     }
   }
 }
-`
+```
 
 
