@@ -19,7 +19,7 @@ move the shield left and right by clicking the left and right arrow keys or scro
 
 ![alt text](https://github.com/asallem94/Cannon-Guardian/blob/master/app/assets/videos/cg_gif.gif "gif demo")
 
-###For developers a little inside on the wave generation:
+### For developers a little inside on the wave generation:
 
 Every ten miliseconds a the attacking wave is regenerated with an array of cannon objects
 Each cannon object is rendered after looping through all the created cannons.  if a cannon falls of the bottom of the screen or collides with the shield it is removed from the array and will never be rendered again.
