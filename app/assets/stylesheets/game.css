@@ -36,6 +36,13 @@ a {
   top: 10%;
 }
 
+.subtitle {
+  font-family: sans-serif;
+  color: white;
+  /* background-color: black; */
+  margin: 0;
+}
+
 .layout {
   position: absolute;
   right: 0;
@@ -54,7 +61,7 @@ a {
 }
 
 .link-class {
-  margin-top: 1em;
+  margin-top: 0.5em;
   color: white;
   font-size: 1.5em;
   text-decoration: none;
@@ -68,9 +75,11 @@ a {
 .controls {
   max-width: 20%;
   min-width: 20%;
-  margin-top: 1em;
+  margin-top: 0.5em;
   color: white;
   font-size: 1.5em;
+  display: flex;
+  justify-content: space-around;
 }
 
 .clickable:hover {
@@ -89,4 +98,8 @@ a {
 
 .muted {
   display: none
+}
+
+.icon {
+  margin-left: 1em;
 }

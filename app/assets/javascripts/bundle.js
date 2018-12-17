@@ -578,7 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvasElement = document.getElementById('canvasEl');
   const ctx = canvasElement.getContext("2d");
 
-  const canWidth = document.getElementById('wallpaper').width * 0.60;
+  const canWidth = document.getElementById('wallpaper').width * 0.50;
   const canHeight = document.getElementById('wallpaper').height * 0.70;
 
   canvasElement.width = canWidth;
