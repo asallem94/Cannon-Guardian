@@ -11,6 +11,8 @@ canvas {
   margin: 0;
   box-sizing: border-box;
   position: relative;
+  /* background: rgb(0,0,60); */
+  background: linear-gradient(90deg, rgba(0,0,60,1) 26%, rgba(6,30,109,1) 27%, rgba(0,0,60,1) 28%, rgba(0,0,60,1) 32%, rgba(6,30,109,1) 33%, rgba(0,0,60,1) 34%, rgba(0,0,60,1) 66%, rgba(6,30,109,1) 67%, rgba(0,0,60,1) 68%, rgba(0,0,60,1) 69%, rgba(6,30,109,1) 69.5%, rgba(0,0,60,1) 70.5%)
 }
 
 /* background image */
